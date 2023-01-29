@@ -12,5 +12,5 @@ message Lottery {
   cosmos.base.v1beta1.Coin currentMinBet = 4 [(gogoproto.nullable) = false]; 
   cosmos.base.v1beta1.Coin currentMaxBet = 5 [(gogoproto.nullable) = false]; 
   string txDataAll = 6; 
-  
+  string lastWinner = 7;
 }

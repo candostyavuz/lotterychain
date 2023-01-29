@@ -110,6 +110,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
 			TxDataAll:     lottery.TxDataAll + msg.String(),
+			LastWinner:    lottery.LastWinner,
 		}
 		k.SetLottery(ctx, updatedLottery)
 
@@ -150,6 +151,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
 			TxDataAll:     lottery.TxDataAll + msg.String(),
+			LastWinner:    lottery.LastWinner,
 		}
 		k.SetLottery(ctx, updatedLottery)
 

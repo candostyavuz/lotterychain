@@ -45345,6 +45345,8 @@ paths:
                       signatures required by gogoproto.
                   txDataAll:
                     type: string
+                  lastWinner:
+                    type: string
         default:
           description: An unexpected error response.
           schema:
@@ -75308,6 +75310,8 @@ definitions:
           signatures required by gogoproto.
       txDataAll:
         type: string
+      lastWinner:
+        type: string
   lotterychain.lottery.MsgEnterLotteryResponse:
     type: object
   lotterychain.lottery.Params:
@@ -75461,6 +75465,8 @@ definitions:
 
               signatures required by gogoproto.
           txDataAll:
+            type: string
+          lastWinner:
             type: string
   lotterychain.lottery.QueryGetParticipantResponse:
     type: object
