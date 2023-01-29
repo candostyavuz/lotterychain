@@ -18,4 +18,9 @@ func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, k keeper.Keeper) {
 	if lottery.TxCounter >= 10 {
 		k.DistributeRewards(ctx)
 	}
+
+	// Reset Participants
+	for i := uint64(0); i < lottery.TxCounter; i++ {
+		k.RemoveParticipant(ctx, i)
+	}
 }
