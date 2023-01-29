@@ -33,7 +33,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 	// Check if the address is already registered
 	var isRegistered bool = false
 	var registerIndex uint64 = 0
-	for i := uint64(1); i <= lottery.TxCounter; i++ {
+	for i := uint64(0); i < lottery.TxCounter; i++ {
 		participant, isFound := k.GetParticipant(ctx, i)
 		if isFound {
 			if participant.Address == msg.Creator {
@@ -75,7 +75,6 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 	// New participant entering the lottery case
 	if !isRegistered {
 		// Update lottery object
-		txCounter := lottery.TxCounter + 1
 		totalFees := lottery.TotalFees.Add(fee)
 		totalBets := lottery.TotalBets.Add(msgBet)
 		//
@@ -93,7 +92,17 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			currMaxBet = lottery.CurrentMaxBet
 		}
 
+		// Create participant object
+		newParticipant := types.Participant{
+			Id:      lottery.TxCounter,
+			Address: participantAddress.String(),
+			Bet:     msgBet,
+			TxData:  msg.String(),
+		}
+		k.SetParticipant(ctx, newParticipant)
+
 		// Update lottery object
+		txCounter := lottery.TxCounter + 1
 		updatedLottery := types.Lottery{
 			TxCounter:     txCounter,
 			TotalFees:     totalFees,
@@ -104,14 +113,6 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		}
 		k.SetLottery(ctx, updatedLottery)
 
-		// Create participant object
-		newParticipant := types.Participant{
-			Id:      txCounter, // starting from 1
-			Address: participantAddress.String(),
-			Bet:     msgBet,
-			TxData:  msg.String(),
-		}
-		k.SetParticipant(ctx, newParticipant)
 	} else { // if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.
 		participant, _ := k.GetParticipant(ctx, registerIndex)
 
@@ -127,7 +128,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 
 		// Update participant object
 		newParticipant := types.Participant{
-			Id:      participant.Id, // starting from 1
+			Id:      participant.Id,
 			Address: participant.Address,
 			Bet:     msgBet,
 			TxData:  participant.TxData + msg.String(),
@@ -148,7 +149,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			TotalBets:     totalBets,
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
-			TxDataAll:     lottery.TxDataAll + msg.String(), // TBD
+			TxDataAll:     lottery.TxDataAll + msg.String(),
 		}
 		k.SetLottery(ctx, updatedLottery)
 
