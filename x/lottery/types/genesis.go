@@ -2,6 +2,8 @@ package types
 
 import (
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // DefaultIndex is the default global index
@@ -11,7 +13,14 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		ParticipantList: []Participant{},
-		Lottery:         nil,
+		Lottery: &Lottery{
+			TxCounter:     0,
+			TotalFees:     sdk.NewCoin("token", sdk.ZeroInt()),
+			TotalBets:     sdk.NewCoin("token", sdk.ZeroInt()),
+			CurrentMinBet: sdk.NewCoin("token", sdk.ZeroInt()),
+			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
+			TxDataAll:     "", // TBD
+		},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
