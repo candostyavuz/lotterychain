@@ -17,7 +17,7 @@ func DefaultGenesis() *GenesisState {
 			TxCounter:     0,
 			TotalFees:     sdk.NewCoin("token", sdk.ZeroInt()),
 			TotalBets:     sdk.NewCoin("token", sdk.ZeroInt()),
-			CurrentMinBet: sdk.NewCoin("token", sdk.ZeroInt()),
+			CurrentMinBet: sdk.NewCoin("token", sdk.NewInt(9223372036854775807)),
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "", // TBD
 		},

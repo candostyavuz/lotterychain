@@ -9,7 +9,7 @@ import (
 	"lotterychain/x/lottery/types"
 )
 
-// Valid only when sender has enough funds to cover lottery fee + minimal bet
+// ToDo: min - max bet proper update
 // ToDo: revert tx after txCounter hits 10
 // ToDo: the chosen block proposer can't have any lottery transactions with itself as a sender
 
