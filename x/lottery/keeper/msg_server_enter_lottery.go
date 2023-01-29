@@ -9,8 +9,6 @@ import (
 	"lotterychain/x/lottery/types"
 )
 
-// ToDo: min - max bet proper update
-// ToDo: revert tx after txCounter hits 10
 // ToDo: the chosen block proposer can't have any lottery transactions with itself as a sender
 
 // 1. Check if participant is already registered
@@ -94,22 +92,24 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		} else {
 			currMaxBet = lottery.CurrentMaxBet
 		}
+
+		// Update lottery object
 		updatedLottery := types.Lottery{
 			TxCounter:     txCounter,
 			TotalFees:     totalFees,
 			TotalBets:     totalBets,
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
-			TxDataAll:     "", // TBD
+			TxDataAll:     lottery.TxDataAll + msg.String(),
 		}
 		k.SetLottery(ctx, updatedLottery)
 
-		// Update participant object
+		// Create participant object
 		newParticipant := types.Participant{
 			Id:      txCounter, // starting from 1
 			Address: participantAddress.String(),
 			Bet:     msgBet,
-			TxData:  "", //TBD
+			TxData:  msg.String(),
 		}
 		k.SetParticipant(ctx, newParticipant)
 	} else { // if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.
@@ -130,7 +130,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			Id:      participant.Id, // starting from 1
 			Address: participant.Address,
 			Bet:     msgBet,
-			TxData:  "", //TBD
+			TxData:  participant.TxData + msg.String(),
 		}
 		k.SetParticipant(ctx, newParticipant)
 
@@ -141,14 +141,14 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		currMaxBet = k.UpdateMaxBet(ctx)
 		currMinBet = k.UpdateMinBet(ctx)
 
-		// Update lottery
+		// Update lottery object
 		updatedLottery := types.Lottery{
 			TxCounter:     lottery.TxCounter,
 			TotalFees:     totalFees,
 			TotalBets:     totalBets,
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
-			TxDataAll:     "", // TBD
+			TxDataAll:     lottery.TxDataAll + msg.String(), // TBD
 		}
 		k.SetLottery(ctx, updatedLottery)
 

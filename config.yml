@@ -15,6 +15,21 @@ accounts:
 - name: client5
   coins:
   - 500000000token
+- name: client6
+  coins:
+  - 500000000token
+- name: client7
+  coins:
+  - 500000000token
+- name: client8
+  coins:
+  - 500000000token
+- name: client9
+  coins:
+  - 500000000token
+- name: client10
+  coins:
+  - 500000000token
 - name: alice
   coins:
   - 20000token
