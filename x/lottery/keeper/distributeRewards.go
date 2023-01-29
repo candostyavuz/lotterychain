@@ -12,7 +12,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 
 	hash := sha256.Sum256([]byte(lottery.TxDataAll))
 	lowest16bits := uint16(hash[0])<<8 + uint16(hash[1])
-	winnerId := uint64(lowest16bits) % 10
+	winnerId := uint64(lowest16bits) % lottery.TxCounter
 
 	winner, _ := k.GetParticipant(ctx, winnerId)
 
