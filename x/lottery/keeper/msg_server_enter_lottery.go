@@ -32,49 +32,51 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 
 	// Check if the address is already registered
 	var isRegistered bool = false
+	var registerIndex uint64 = 0
 	for i := uint64(1); i <= lottery.TxCounter; i++ {
 		participant, isFound := k.GetParticipant(ctx, i)
 		if isFound {
 			if participant.Address == msg.Creator {
 				isRegistered = true
+				registerIndex = i
 				break
 			}
 		}
 	}
 
+	// Check entry base fee
+	fee := sdk.NewInt64Coin("token", requiredFeeInt)
+	msgFee := msg.Fee
+
+	if msgFee.IsLT(fee) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInsufficientFee, "not enough fee!")
+	}
+
+	// Check bet amount
+	minBet := sdk.NewInt64Coin("token", minBetInt)
+	maxBet := sdk.NewInt64Coin("token", maxBetInt)
+	msgBet := msg.Bet
+
+	if msgBet.IsLT(minBet) || maxBet.IsLT(msgBet) {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bet is out of bounds")
+	}
+
+	// Transfer fee + bet into the lottery pool
+	participantAddress, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid address!")
+	}
+	transferAmount := sdk.Coins{msgBet.Add(fee)} // don't send msg.Fee since it can be larger than required fee amount (5token)
+	transferErr := k.bankKeeper.SendCoinsFromAccountToModule(ctx, participantAddress, types.ModuleName, transferAmount)
+	if transferErr != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "accont to module transfer error!")
+	}
+
 	// New participant entering the lottery case
 	if !isRegistered {
-		// Check entry base fee
-		fee := sdk.NewInt64Coin("token", requiredFeeInt)
-		msgFee := msg.Fee
-
-		if msgFee.IsLT(fee) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInsufficientFee, "not enough fee!")
-		}
-
-		// Check bet amount
-		minBet := sdk.NewInt64Coin("token", minBetInt)
-		maxBet := sdk.NewInt64Coin("token", maxBetInt)
-		msgBet := msg.Bet
-
-		if msgBet.IsLT(minBet) || maxBet.IsLT(msgBet) {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "bet is out of bounds")
-		}
-
-		// Transfer fee + bet into the lottery pool
-		creatorAddress, err := sdk.AccAddressFromBech32(msg.Creator)
-		if err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "invalid address!")
-		}
-		transferAmount := sdk.Coins{msgBet.Add(msgFee)}
-		transferErr := k.bankKeeper.SendCoinsFromAccountToModule(ctx, creatorAddress, types.ModuleName, transferAmount)
-		if transferErr != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "accont to module transfer error!")
-		}
-
 		// Update lottery object
 		txCounter := lottery.TxCounter + 1
-		totalFees := lottery.TotalFees.Add(msgFee)
+		totalFees := lottery.TotalFees.Add(fee)
 		totalBets := lottery.TotalBets.Add(msgBet)
 		//
 		var currMinBet sdk.Coin
@@ -103,13 +105,55 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		// Update participant object
 		newParticipant := types.Participant{
 			Id:      txCounter, // starting from 1
-			Address: creatorAddress.String(),
+			Address: participantAddress.String(),
 			Bet:     msgBet,
 			TxData:  "", //TBD
 		}
 		k.SetParticipant(ctx, newParticipant)
 	} else {
+		participant, _ := k.GetParticipant(ctx, registerIndex)
 
+		totalFees := lottery.TotalFees.Add(fee)                           // fees are not refunded
+		totalBets := (lottery.TotalBets.Sub(participant.Bet)).Add(msgBet) // previous recorded bet is refunded, new bet is added
+
+		// refund previous bet
+		transferRefundErr := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, participantAddress, sdk.Coins{participant.Bet})
+		if transferRefundErr != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "cannot refund")
+		}
+
+		//
+		var currMinBet sdk.Coin
+		if msgBet.IsLT(lottery.CurrentMinBet) { // No ternary operator in go...
+			currMinBet = msgBet
+		} else {
+			currMinBet = lottery.CurrentMinBet
+		}
+		//
+		var currMaxBet sdk.Coin
+		if msgBet.IsGTE(lottery.CurrentMaxBet) { // No ternary operator in go...
+			currMaxBet = msgBet
+		} else {
+			currMaxBet = lottery.CurrentMaxBet
+		}
+		updatedLottery := types.Lottery{
+			TxCounter:     lottery.TxCounter,
+			TotalFees:     totalFees,
+			TotalBets:     totalBets,
+			CurrentMinBet: currMinBet,
+			CurrentMaxBet: currMaxBet,
+			TxDataAll:     "", // TBD
+		}
+		k.SetLottery(ctx, updatedLottery)
+
+		// Update participant object
+		newParticipant := types.Participant{
+			Id:      participant.Id, // starting from 1
+			Address: participant.Address,
+			Bet:     msgBet,
+			TxData:  "", //TBD
+		}
+		k.SetParticipant(ctx, newParticipant)
 	}
 
 	return &types.MsgEnterLotteryResponse{}, nil

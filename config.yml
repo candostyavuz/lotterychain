@@ -1,5 +1,20 @@
 version: 1
 accounts:
+- name: client1
+  coins:
+  - 500000000token
+- name: client2
+  coins:
+  - 500000000token
+- name: client3
+  coins:
+  - 500000000token
+- name: client4
+  coins:
+  - 500000000token
+- name: client5
+  coins:
+  - 500000000token
 - name: alice
   coins:
   - 20000token
