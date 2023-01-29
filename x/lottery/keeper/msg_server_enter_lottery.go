@@ -138,24 +138,8 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		var currMinBet sdk.Coin
 		var currMaxBet sdk.Coin
 
-		firstParticipant, _ := k.GetParticipant(ctx, 1) // updated bets are available in this participant
-		biggestBet := firstParticipant.Bet
-		for i := uint64(1); i <= lottery.TxCounter; i++ {
-			participant, _ := k.GetParticipant(ctx, i)
-			if biggestBet.IsLT(participant.Bet) {
-				biggestBet = participant.Bet
-			}
-		}
-		currMaxBet = biggestBet
-
-		smallestBet := firstParticipant.Bet
-		for i := uint64(1); i <= lottery.TxCounter; i++ {
-			participant, _ := k.GetParticipant(ctx, i)
-			if participant.Bet.IsLT(smallestBet) {
-				smallestBet = participant.Bet
-			}
-		}
-		currMinBet = smallestBet
+		currMaxBet = k.UpdateMaxBet(ctx)
+		currMinBet = k.UpdateMinBet(ctx)
 
 		// Update lottery
 		updatedLottery := types.Lottery{
