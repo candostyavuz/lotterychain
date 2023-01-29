@@ -13,5 +13,9 @@ import (
 func EndBlocker(ctx sdk.Context, req abci.RequestEndBlock, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
-	k.DistributeRewards(ctx)
+	lottery, _ := k.GetLottery(ctx)
+
+	if lottery.TxCounter >= 10 {
+		k.DistributeRewards(ctx)
+	}
 }
