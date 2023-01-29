@@ -1,7 +1,21 @@
 syntax = "proto3";
+
 package lotterychain.lottery;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "lotterychain/x/lottery/types";
 
 // Msg defines the Msg service.
-service Msg {}
+service Msg {
+  rpc EnterLottery (MsgEnterLottery) returns (MsgEnterLotteryResponse);
+}
+message MsgEnterLottery {
+  string                   creator = 1;
+  cosmos.base.v1beta1.Coin fee     = 2 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin bet     = 3 [(gogoproto.nullable) = false];
+}
+
+message MsgEnterLotteryResponse {}
+

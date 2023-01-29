@@ -75308,6 +75308,8 @@ definitions:
           signatures required by gogoproto.
       txDataAll:
         type: string
+  lotterychain.lottery.MsgEnterLotteryResponse:
+    type: object
   lotterychain.lottery.Params:
     type: object
     description: Params defines the parameters for the module.
