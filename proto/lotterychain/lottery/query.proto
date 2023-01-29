@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "lotterychain/lottery/params.proto";
 import "lotterychain/lottery/participant.proto";
+import "lotterychain/lottery/lottery.proto";
 
 option go_package = "lotterychain/x/lottery/types";
 
@@ -26,6 +27,12 @@ service Query {
   }
   rpc ParticipantAll (QueryAllParticipantRequest) returns (QueryAllParticipantResponse) {
     option (google.api.http).get = "/lotterychain/lottery/participant";
+  
+  }
+  
+  // Queries a Lottery by index.
+  rpc Lottery (QueryGetLotteryRequest) returns (QueryGetLotteryResponse) {
+    option (google.api.http).get = "/lotterychain/lottery/lottery";
   
   }
 }
@@ -54,5 +61,11 @@ message QueryAllParticipantRequest {
 message QueryAllParticipantResponse {
   repeated Participant                            Participant = 1 [(gogoproto.nullable) = false];
            cosmos.base.query.v1beta1.PageResponse pagination  = 2;
+}
+
+message QueryGetLotteryRequest {}
+
+message QueryGetLotteryResponse {
+  Lottery Lottery = 1 [(gogoproto.nullable) = false];
 }
 

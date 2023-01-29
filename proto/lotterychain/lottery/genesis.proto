@@ -5,6 +5,7 @@ package lotterychain.lottery;
 import "gogoproto/gogo.proto";
 import "lotterychain/lottery/params.proto";
 import "lotterychain/lottery/participant.proto";
+import "lotterychain/lottery/lottery.proto";
 
 option go_package = "lotterychain/x/lottery/types";
 
@@ -13,5 +14,6 @@ message GenesisState {
            Params      params           = 1 [(gogoproto.nullable) = false];
   repeated Participant participantList  = 2 [(gogoproto.nullable) = false];
            uint64      participantCount = 3;
+           Lottery     lottery          = 4;
 }
 

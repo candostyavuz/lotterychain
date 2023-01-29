@@ -22,3 +22,7 @@ const (
 	ParticipantKey      = "Participant/value/"
 	ParticipantCountKey = "Participant/count/"
 )
+
+const (
+	LotteryKey = "Lottery/value/"
+)

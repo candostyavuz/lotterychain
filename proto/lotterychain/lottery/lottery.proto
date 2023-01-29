@@ -1,0 +1,16 @@
+syntax = "proto3";
+package lotterychain.lottery;
+
+option go_package = "lotterychain/x/lottery/types";
+import "gogoproto/gogo.proto"; 
+import "cosmos/base/v1beta1/coin.proto"; 
+
+message Lottery {
+  uint64 txCounter = 1; 
+  cosmos.base.v1beta1.Coin totalFees = 2 [(gogoproto.nullable) = false]; 
+  cosmos.base.v1beta1.Coin totalBets = 3 [(gogoproto.nullable) = false]; 
+  cosmos.base.v1beta1.Coin currentMinBet = 4 [(gogoproto.nullable) = false]; 
+  cosmos.base.v1beta1.Coin currentMaxBet = 5 [(gogoproto.nullable) = false]; 
+  string txDataAll = 6; 
+  
+}

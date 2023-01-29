@@ -15,6 +15,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 
 	// Set participant count
 	k.SetParticipantCount(ctx, genState.ParticipantCount)
+	// Set if defined
+	if genState.Lottery != nil {
+		k.SetLottery(ctx, *genState.Lottery)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -26,6 +30,11 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.ParticipantList = k.GetAllParticipant(ctx)
 	genesis.ParticipantCount = k.GetParticipantCount(ctx)
+	// Get all lottery
+	lottery, found := k.GetLottery(ctx)
+	if found {
+		genesis.Lottery = &lottery
+	}
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
