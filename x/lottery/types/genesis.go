@@ -19,7 +19,7 @@ func DefaultGenesis() *GenesisState {
 			TotalBets:     sdk.NewCoin("token", sdk.ZeroInt()),
 			CurrentMinBet: sdk.NewCoin("token", sdk.NewInt(9223372036854775807)),
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
-			TxDataAll:     "", // TBD
+			TxDataAll:     "",
 		},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
