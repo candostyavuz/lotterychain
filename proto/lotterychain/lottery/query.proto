@@ -1,26 +1,58 @@
 syntax = "proto3";
+
 package lotterychain.lottery;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "lotterychain/lottery/params.proto";
+import "lotterychain/lottery/participant.proto";
 
 option go_package = "lotterychain/x/lottery/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  
   // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/lotterychain/lottery/params";
+  
+  }
+  
+  // Queries a list of Participant items.
+  rpc Participant    (QueryGetParticipantRequest) returns (QueryGetParticipantResponse) {
+    option (google.api.http).get = "/lotterychain/lottery/participant/{id}";
+  
+  }
+  rpc ParticipantAll (QueryAllParticipantRequest) returns (QueryAllParticipantResponse) {
+    option (google.api.http).get = "/lotterychain/lottery/participant";
+  
   }
 }
-
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
+  
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
 }
+
+message QueryGetParticipantRequest {
+  uint64 id = 1;
+}
+
+message QueryGetParticipantResponse {
+  Participant Participant = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllParticipantRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllParticipantResponse {
+  repeated Participant                            Participant = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination  = 2;
+}
+

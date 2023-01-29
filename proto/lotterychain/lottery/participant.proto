@@ -1,0 +1,14 @@
+syntax = "proto3";
+package lotterychain.lottery;
+
+option go_package = "lotterychain/x/lottery/types";
+import "gogoproto/gogo.proto"; 
+import "cosmos/base/v1beta1/coin.proto"; 
+
+message Participant {
+  uint64 id = 1;
+  string address = 2; 
+  cosmos.base.v1beta1.Coin bet = 3 [(gogoproto.nullable) = false]; 
+  string txData = 4; 
+  
+}
