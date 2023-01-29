@@ -14,7 +14,9 @@ import (
 // ToDo: the chosen block proposer can't have any lottery transactions with itself as a sender
 
 // 1. Check if participant is already registered
-//	if yes: update bet amount (if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.)
+//	if yes: update bet amount of the participant.
+//		txCounter remains same. fee is not refunded. previous bet is REFUNDED. minBet & maxBet adjusted according to new bet
+//		(if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.)
 //	if no: register user as a lottery participant
 
 const requiredFeeInt int64 = 5_000000 // 5token with 6 decimals
@@ -110,11 +112,10 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			TxData:  "", //TBD
 		}
 		k.SetParticipant(ctx, newParticipant)
-	} else {
+	} else { // if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.
 		participant, _ := k.GetParticipant(ctx, registerIndex)
 
-		totalFees := lottery.TotalFees.Add(fee)                           // fees are not refunded
-		totalBets := (lottery.TotalBets.Sub(participant.Bet)).Add(msgBet) // previous recorded bet is refunded, new bet is added
+		totalFees := lottery.TotalFees.Add(fee) // fees are not refunded
 
 		// refund previous bet
 		transferRefundErr := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, participantAddress, sdk.Coins{participant.Bet})
@@ -122,20 +123,41 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "cannot refund")
 		}
 
-		//
+		totalBets := (lottery.TotalBets.Sub(participant.Bet)).Add(msgBet) // previous recorded bet is refunded, new bet is added
+
+		// Update participant object
+		newParticipant := types.Participant{
+			Id:      participant.Id, // starting from 1
+			Address: participant.Address,
+			Bet:     msgBet,
+			TxData:  "", //TBD
+		}
+		k.SetParticipant(ctx, newParticipant)
+
+		// minBet & maxBet update
 		var currMinBet sdk.Coin
-		if msgBet.IsLT(lottery.CurrentMinBet) { // No ternary operator in go...
-			currMinBet = msgBet
-		} else {
-			currMinBet = lottery.CurrentMinBet
-		}
-		//
 		var currMaxBet sdk.Coin
-		if msgBet.IsGTE(lottery.CurrentMaxBet) { // No ternary operator in go...
-			currMaxBet = msgBet
-		} else {
-			currMaxBet = lottery.CurrentMaxBet
+
+		firstParticipant, _ := k.GetParticipant(ctx, 1) // updated bets are available in this participant
+		biggestBet := firstParticipant.Bet
+		for i := uint64(1); i <= lottery.TxCounter; i++ {
+			participant, _ := k.GetParticipant(ctx, i)
+			if biggestBet.IsLT(participant.Bet) {
+				biggestBet = participant.Bet
+			}
 		}
+		currMaxBet = biggestBet
+
+		smallestBet := firstParticipant.Bet
+		for i := uint64(1); i <= lottery.TxCounter; i++ {
+			participant, _ := k.GetParticipant(ctx, i)
+			if participant.Bet.IsLT(smallestBet) {
+				smallestBet = participant.Bet
+			}
+		}
+		currMinBet = smallestBet
+
+		// Update lottery
 		updatedLottery := types.Lottery{
 			TxCounter:     lottery.TxCounter,
 			TotalFees:     totalFees,
@@ -146,14 +168,6 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		}
 		k.SetLottery(ctx, updatedLottery)
 
-		// Update participant object
-		newParticipant := types.Participant{
-			Id:      participant.Id, // starting from 1
-			Address: participant.Address,
-			Bet:     msgBet,
-			TxData:  "", //TBD
-		}
-		k.SetParticipant(ctx, newParticipant)
 	}
 
 	return &types.MsgEnterLotteryResponse{}, nil
