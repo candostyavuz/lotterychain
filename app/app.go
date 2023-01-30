@@ -106,6 +106,7 @@ import (
 	lotterymodule "lotterychain/x/lottery"
 	lotterymodulekeeper "lotterychain/x/lottery/keeper"
 	lotterymoduletypes "lotterychain/x/lottery/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "lotterychain/app/params"
@@ -503,6 +504,7 @@ func New(
 		app.GetSubspace(lotterymoduletypes.ModuleName),
 
 		app.BankKeeper,
+		app.StakingKeeper,
 	)
 	lotteryModule := lotterymodule.NewAppModule(appCodec, app.LotteryKeeper, app.AccountKeeper, app.BankKeeper)
 

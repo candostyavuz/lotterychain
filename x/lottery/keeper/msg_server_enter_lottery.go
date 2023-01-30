@@ -31,6 +31,16 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "couldn't fetch the lottery object")
 	}
 
+	// fetch validator address
+	validators := k.stakingKeeper.GetLastValidators(ctx)
+	valAddr := validators[0].String()
+	if valAddr == "" {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "validator couldn't be fetched")
+
+	}
+	// for i := 0; i < len(validators); i++ {
+	// }
+
 	// Check if the address is already registered
 	var isRegistered bool = false
 	var registerIndex uint64 = 0
