@@ -16,6 +16,8 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 
 	winner, _ := k.GetParticipant(ctx, winnerId)
 
+	winnerAccount, _ := sdk.AccAddressFromBech32(winner.Address)
+
 	// Check bets
 	if winner.Bet.IsEqual(lottery.CurrentMinBet) { // no rewards, lottery total pool is carried over
 		// reset lottery, keep all the prize pool
@@ -31,7 +33,8 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 		k.SetLottery(ctx, resetLottery)
 	} else if winner.Bet.IsEqual(lottery.CurrentMaxBet) { // full rewards
 		rewardAmount := lottery.TotalBets.Add(lottery.TotalFees)
-		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(winner.Address), sdk.Coins{rewardAmount})
+
+		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, winnerAccount, sdk.Coins{rewardAmount})
 		// reset lottery
 		resetLottery := types.Lottery{
 			TxCounter:     0,
@@ -40,12 +43,12 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 			CurrentMinBet: sdk.NewCoin("token", sdk.NewInt(9223372036854775807)),
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "",
-			LastWinner:    winner.Address,
+			LastWinner:    winnerAccount.String(),
 		}
 		k.SetLottery(ctx, resetLottery)
 	} else { // only bets (fees paid remains in lottery pool)
 		rewardAmount := lottery.TotalBets
-		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, sdk.AccAddress(winner.Address), sdk.Coins{rewardAmount})
+		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, winnerAccount, sdk.Coins{rewardAmount})
 		// reset lottery, keep fees in the prize pool
 		resetLottery := types.Lottery{
 			TxCounter:     0,
@@ -54,7 +57,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 			CurrentMinBet: sdk.NewCoin("token", sdk.NewInt(9223372036854775807)),
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "",
-			LastWinner:    winner.Address,
+			LastWinner:    winnerAccount.String(),
 		}
 		k.SetLottery(ctx, resetLottery)
 	}
