@@ -29,6 +29,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "",
 			LastWinner:    lottery.LastWinner,
+			LastWinnerIdx: lottery.LastWinnerIdx,
 		}
 		k.SetLottery(ctx, resetLottery)
 	} else if winner.Bet.IsEqual(lottery.CurrentMaxBet) { // full rewards
@@ -44,6 +45,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "",
 			LastWinner:    winnerAccount.String(),
+			LastWinnerIdx: winnerId,
 		}
 		k.SetLottery(ctx, resetLottery)
 	} else { // only bets (fees paid remains in lottery pool)
@@ -58,6 +60,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 			CurrentMaxBet: sdk.NewCoin("token", sdk.ZeroInt()),
 			TxDataAll:     "",
 			LastWinner:    winnerAccount.String(),
+			LastWinnerIdx: winnerId,
 		}
 		k.SetLottery(ctx, resetLottery)
 	}

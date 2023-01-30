@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -92,12 +93,15 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			currMaxBet = lottery.CurrentMaxBet
 		}
 
+		// participant tx data (blocktime info is also appended for increased pseudo randomness)
+		txData := msg.String() + ctx.BlockTime().Format(time.UnixDate)
+
 		// Create participant object
 		newParticipant := types.Participant{
 			Id:      lottery.TxCounter,
 			Address: participantAddress.String(),
 			Bet:     msgBet,
-			TxData:  msg.String(),
+			TxData:  txData,
 		}
 		k.SetParticipant(ctx, newParticipant)
 
@@ -109,8 +113,9 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			TotalBets:     totalBets,
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
-			TxDataAll:     lottery.TxDataAll + msg.String(),
+			TxDataAll:     lottery.TxDataAll + txData,
 			LastWinner:    lottery.LastWinner,
+			LastWinnerIdx: lottery.LastWinnerIdx,
 		}
 		k.SetLottery(ctx, updatedLottery)
 
@@ -127,12 +132,15 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 
 		totalBets := (lottery.TotalBets.Sub(participant.Bet)).Add(msgBet) // previous recorded bet is refunded, new bet is added
 
+		// tx Data is appended in the case of multiple tx coming from the same address
+		txData := msg.String() + ctx.BlockTime().Format(time.UnixDate)
+
 		// Update participant object
 		newParticipant := types.Participant{
 			Id:      participant.Id,
 			Address: participant.Address,
 			Bet:     msgBet,
-			TxData:  participant.TxData + msg.String(),
+			TxData:  participant.TxData + txData,
 		}
 		k.SetParticipant(ctx, newParticipant)
 
@@ -150,8 +158,9 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 			TotalBets:     totalBets,
 			CurrentMinBet: currMinBet,
 			CurrentMaxBet: currMaxBet,
-			TxDataAll:     lottery.TxDataAll + msg.String(),
+			TxDataAll:     lottery.TxDataAll + txData,
 			LastWinner:    lottery.LastWinner,
+			LastWinnerIdx: lottery.LastWinnerIdx,
 		}
 		k.SetLottery(ctx, updatedLottery)
 

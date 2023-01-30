@@ -45347,6 +45347,9 @@ paths:
                     type: string
                   lastWinner:
                     type: string
+                  lastWinnerIdx:
+                    type: string
+                    format: uint64
         default:
           description: An unexpected error response.
           schema:
@@ -75312,6 +75315,9 @@ definitions:
         type: string
       lastWinner:
         type: string
+      lastWinnerIdx:
+        type: string
+        format: uint64
   lotterychain.lottery.MsgEnterLotteryResponse:
     type: object
   lotterychain.lottery.Params:
@@ -75468,6 +75474,9 @@ definitions:
             type: string
           lastWinner:
             type: string
+          lastWinnerIdx:
+            type: string
+            format: uint64
   lotterychain.lottery.QueryGetParticipantResponse:
     type: object
     properties:
