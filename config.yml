@@ -32,7 +32,7 @@ accounts:
   - 500000000token
 - name: alice
   coins:
-  - 20000token
+  - 2000000000token
   - 200000000stake
 - name: bob
   coins:

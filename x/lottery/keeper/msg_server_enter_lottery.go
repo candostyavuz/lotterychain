@@ -10,14 +10,6 @@ import (
 	"lotterychain/x/lottery/types"
 )
 
-// ToDo: the chosen block proposer can't have any lottery transactions with itself as a sender
-
-// 1. Check if participant is already registered
-//	if yes: update bet amount of the participant.
-//		txCounter remains same. fee is not refunded. previous bet is REFUNDED. minBet & maxBet adjusted according to new bet
-//		(if the same user has new lottery transactions, then only the last one counts, counter doesn’t increase on substitution.)
-//	if no: register user as a lottery participant
-
 const requiredFeeInt int64 = 5_000000 // 5token with 6 decimals
 const minBetInt int64 = 1_000000      // 1token with 6 decimals
 const maxBetInt int64 = 100_000000    // 100token with 6 decimals
@@ -31,15 +23,11 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "couldn't fetch the lottery object")
 	}
 
-	// fetch validator address
-	validators := k.stakingKeeper.GetLastValidators(ctx)
-	valAddr := validators[0].String()
-	if valAddr == "" {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "validator couldn't be fetched")
-
+	// Block proposer check - Designed for single validator network
+	isProposer, err := k.BlockProposerParticipantCheck(ctx, msg.Creator)
+	if isProposer {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "proposer can't participate!")
 	}
-	// for i := 0; i < len(validators); i++ {
-	// }
 
 	// Check if the address is already registered
 	var isRegistered bool = false
