@@ -134,7 +134,7 @@ Queries total balances of a specific client
 
   For more practical testing, I prefer 30 seconds block time, but a different block time can always be set by configuring `timeout_commit` parameter inside the `config.toml` directory. `config.toml` can be found in `~/.lotterchain/config/config.toml`.
 
- ## Demo Script
+## Demo Script
  After node setup is completed and blocks are running, run  `./executedemo.sh`. This script does the following
   1. Prints out `lottery` module balance and all the client balances
   2. Sends `enter-lottery` transaction for 20 clients, with different bet amounts (from 1token to 20token)
@@ -160,21 +160,22 @@ Queries total balances of a specific client
     ```
     4. Finally, prints out the `lottery` module balance and all the client balances to promt the balance & state changes
     5. Script can be run many times to observe game status in a longer period.
+    
+  **txCounter Note:**
+  Although any number of clients can participate before the lottery session ends (when the block is mined), `txCounter` can never be observed above 9 because `lottery` object is reset after the winner is chosen.
 
-    **Note:** Although any number of clients can participate before the lottery session ends (when the block is mined), `txCounter` can never be observed above 9 because `lottery` object is reset after the winner is chosen.
+  ## Other Test Cases:
+  (Can be tested with Ignite CLI to see revert messages in Terminal)
 
-    ## Other Test Cases:
-    (Can be tested with Ignite CLI to see revert messages in Terminal)
+  1. Validator `lotteryvalidator` tries to participate in lottery:
+    **tx:** `lotterychaind tx lottery enter-lottery 5000000token 60000000token --from lotteryvalidator`
+    **result:** `raw_log: 'failed to execute message; message index: 0: proposer can''t participate!: unauthorized'`
 
-    1. Validator `lotteryvalidator` tries to participate in lottery:
-      **tx:** `lotterychaind tx lottery enter-lottery 5000000token 60000000token --from lotteryvalidator`
-      **result:** `raw_log: 'failed to execute message; message index: 0: proposer can''t participate!: unauthorized'`
+  2. Insufficient bet:
+     **tx:** `lotterychaind tx lottery enter-lottery 5000000token 200token --from client2 -y`
+    **result:** `raw_log: 'failed to execute message; message index: 0: bet is out of bounds: invalid request'`
 
-    2. Insufficient bet:
-      **tx:** `lotterychaind tx lottery enter-lottery 5000000token 200token --from client2 -y`
-      **result:** `raw_log: 'failed to execute message; message index: 0: bet is out of bounds: invalid request'`
-
-    3. Out of bounds bet:
-      **tx:** `lotterychaind tx lottery enter-lottery 50token 2000000token --from client2 -y`
-      **result:** `raw_log: 'failed to execute message; message index: 0: not enough fee!: insufficient fee'`
+  3. Out of bounds bet:
+    **tx:** `lotterychaind tx lottery enter-lottery 50token 2000000token --from client2 -y`
+    **result:** `raw_log: 'failed to execute message; message index: 0: not enough fee!: insufficient fee'`
     
