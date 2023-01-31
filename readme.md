@@ -13,7 +13,6 @@ ignite chain serve --reset-once
 
 `serve` command installs dependencies, builds, initializes, and starts the blockchain in development.
 The blockchain (devnet) is configured with `config.yml`. Currently it has 20 client test accounts and a single validator account.
----
 
 ## Modules
 
@@ -34,7 +33,7 @@ The blockchain (devnet) is configured with `config.yml`. Currently it has 20 cli
 * `bet` must be between `1_000_000token` and `100_000_000token` (10^6 decimal fields included)
 * Each user can only participate once in the lottery session. 
 * **If multiple transactions are sent from the same address:**
-    - Only last transaction counts and last sent `bet` amount will be recorded in the `Participant` object.
+    - Only thelast transaction counts and last sent `bet` amount will be recorded in the `Participant` object.
     - Previous `bet` that user paid will be refunded back to its wallet.
     - Any `fee` paid to contract is NOT refunded and stored in the lottery prize pool.
     - If previous `bet` of the user is max / min bet of the current lottery session, the new min/max bet is automatically adjusted based on the current bets in the pool and last bet amount in the participant transaction.
