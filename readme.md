@@ -167,21 +167,21 @@ Queries total balances of a specific client
   ## Other Test Cases:
   (Can be tested with Ignite CLI to see revert messages in Terminal)
 
-  1. Validator `lotteryvalidator` tries to participate in lottery:/
-  **tx:**/
-  `lotterychaind tx lottery enter-lottery 5000000token 60000000token --from lotteryvalidator`/
-  **result:** /
-  `raw_log: 'failed to execute message; message index: 0: proposer can''t participate!: unauthorized'`/
+  **Validator `lotteryvalidator` tries to participate in lottery:**
+  tx:
+  `lotterychaind tx lottery enter-lottery 5000000token 60000000token --from lotteryvalidator`
+  result:
+  `raw_log: 'failed to execute message; message index: 0: proposer can''t participate!: unauthorized'`
 
-  2. Insufficient bet:/
-  **tx:**/
-  `lotterychaind tx lottery enter-lottery 5000000token 200token --from client2 -y`/
-  **result:**/
-  `raw_log: 'failed to execute message; message index: 0: bet is out of bounds: invalid request'`/
+  **Insufficient bet:**
+  tx:
+  `lotterychaind tx lottery enter-lottery 5000000token 200token --from client2 -y`
+  result:
+  `raw_log: 'failed to execute message; message index: 0: bet is out of bounds: invalid request'`
 
-  3. Out of bounds bet:/
-  **tx:**/
-  `lotterychaind tx lottery enter-lottery 50token 2000000token --from client2 -y`/
-  **result:**/
-  `raw_log: 'failed to execute message; message index: 0: not enough fee!: insufficient fee'`/
+  **Out of bounds bet:**
+  tx:
+  `lotterychaind tx lottery enter-lottery 50token 2000000token --from client2 -y`
+  result:
+  `raw_log: 'failed to execute message; message index: 0: not enough fee!: insufficient fee'`
     
