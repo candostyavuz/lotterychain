@@ -23,7 +23,7 @@ func (k msgServer) EnterLottery(goCtx context.Context, msg *types.MsgEnterLotter
 		return nil, sdkerrors.Wrap(sdkerrors.ErrPanic, "couldn't fetch the lottery object")
 	}
 
-	// Block proposer check - Designed for single validator network
+	// Block proposer check  (Designed for single validator network)
 	isProposer, err := k.BlockProposerParticipantCheck(ctx, msg.Creator)
 	if isProposer {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "proposer can't participate!")
