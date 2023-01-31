@@ -139,7 +139,7 @@ Queries total balances of a specific client
   1. Prints out `lottery` module balance and all the client balances
   2. Sends `enter-lottery` transaction for 20 clients, with different bet amounts (from 1token to 20token)
   3. Shows `lottery` storage object. Example:
-    ```
+  ```
     Lottery:
       currentMaxBet:
         amount: "0"
@@ -157,9 +157,9 @@ Queries total balances of a specific client
         denom: token
       txCounter: "0"
       txDataAll: ""
-    ```
-    4. Finally, prints out the `lottery` module balance and all the client balances to promt the balance & state changes
-    5. Script can be run many times to observe game status in a longer period.
+  ```
+  4. Finally, prints out the `lottery` module balance and all the client balances to promt the balance & state changes
+  5. Script can be run many times to observe game status in a longer period.
     
   **txCounter Note:**
   Although any number of clients can participate before the lottery session ends (when the block is mined), `txCounter` can never be observed above 9 because `lottery` object is reset after the winner is chosen.
