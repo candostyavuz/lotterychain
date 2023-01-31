@@ -10,6 +10,7 @@ import (
 func (k Keeper) DistributeRewards(ctx sdk.Context) {
 	lottery, _ := k.GetLottery(ctx)
 
+	// Determine the winners based on all recorded tx data
 	hash := sha256.Sum256([]byte(lottery.TxDataAll))
 	lowest16bits := uint16(hash[0])<<8 + uint16(hash[1])
 	winnerId := uint64(lowest16bits) % lottery.TxCounter
@@ -18,7 +19,7 @@ func (k Keeper) DistributeRewards(ctx sdk.Context) {
 
 	winnerAccount, _ := sdk.AccAddressFromBech32(winner.Address)
 
-	// Check bets
+	// Check bets for correct payout
 	if winner.Bet.IsEqual(lottery.CurrentMinBet) { // no rewards, lottery total pool is carried over
 		// reset lottery, keep all the prize pool
 		resetLottery := types.Lottery{

@@ -24,7 +24,7 @@ The blockchain (devnet) is configured with `config.yml`. Currently it has 20 cli
 
 ## EnterLottery Transaction
 
-**CLI Format**
+**CLI Format:**
 `lotterychaind tx lottery enter-lottery [fee] [bet] [flags]`
 
 **Transaction Rules**

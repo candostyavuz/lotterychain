@@ -30,6 +30,36 @@ accounts:
 - name: client10
   coins:
   - 500000000token
+- name: client11
+  coins:
+  - 500000000token
+- name: client12
+  coins:
+  - 500000000token
+- name: client13
+  coins:
+  - 500000000token
+- name: client14
+  coins:
+  - 500000000token
+- name: client15
+  coins:
+  - 500000000token
+- name: client16
+  coins:
+  - 500000000token
+- name: client17
+  coins:
+  - 500000000token
+- name: client18
+  coins:
+  - 500000000token
+- name: client19
+  coins:
+  - 500000000token
+- name: client20
+  coins:
+  - 500000000token
 - name: alice
   coins:
   - 2000000000token
@@ -49,3 +79,6 @@ faucet:
 validators:
 - name: alice
   bonded: 100000000stake
+  config:
+      consensus:
+        timeout_commit: '5s'
