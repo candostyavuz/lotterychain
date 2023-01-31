@@ -83,4 +83,4 @@ validators:
   bonded: 100000000stake
   config:
     consensus:
-      timeout_commit: 60s
+      timeout_commit: 1s
