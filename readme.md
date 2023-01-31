@@ -38,6 +38,7 @@ The blockchain (devnet) is configured with `config.yml`. Currently it has 20 cli
     - Any `fee` paid to contract is NOT refunded and stored in the lottery prize pool.
     - If previous `bet` of the user is max / min bet of the current lottery session, the new min/max bet is automatically adjusted based on the current bets in the pool and last bet amount in the participant transaction.
 * After total transaction count in the lottery hits 10 (or greater), `EndBlocker` is triggered and winner is detected according to modulus of hash of all appended txData with total number of transactions.
+**Note:** `ctx.BlockTime()` parameter is also appended after each `txData` to increase pseudo-randomness.
 * Payment is done according to rules below:
     - If winner has the highest bet, entire pool including all the `fee` and `bet` is paid to winner.
     - If winner has the lowest bet, nothing is paid to winner and lottery prize pool is carried over to next session.
@@ -115,3 +116,65 @@ Queries total balances stored in `Lottery`module's pool
 
 4. `lotterychaind q bank balances $(lotterychaind keys show client1 -a)`
 Queries total balances of a specific client
+
+
+## Demo Environment
+  Since Ignite CLI treats each message as a separate transaction and times-out if block time is too large, we need to manually setup a lotterychain node to have the full control.
+
+  By running the node setup commands inside the `Makefile` with `./setupdemo.sh start` script, lotterychain node will be up and ready.
+  This script does the following:
+  1. Cleans up relevant directories as well as tendermint data history
+  2. Configures chain parameters
+  3. Adds genesis accounts into keyring with `500_000000token` initial balance
+  4. Sets up the validator & self-delegates validator stake
+  5. Sends genesis transaction, verifies the genesis validity
+  6. Starts the chain
+
+  - Note: `chmod +x setupdemo.sh` command might be needed to execute the script.
+
+  For more practical testing, I prefer 30 seconds block time, but a different block time can always be set by configuring `timeout_commit` parameter inside the `config.toml` directory. `config.toml` can be found in `~/.lotterchain/config/config.toml`.
+
+ ## Demo Script
+ After node setup is completed and blocks are running, run  `./executedemo.sh`. This script does the following
+  1. Prints out `lottery` module balance and all the client balances
+  2. Sends `enter-lottery` transaction for 20 clients, with different bet amounts (from 1token to 20token)
+  3. Shows `lottery` storage object. Example:
+    ```
+    Lottery:
+      currentMaxBet:
+        amount: "0"
+        denom: token
+      currentMinBet:
+        amount: "9223372036854775807"
+        denom: token
+      lastWinner: cosmos1fftlmvgxmd9xenkfpzp0gqpjv67lducgewjxq6
+      lastWinnerIdx: "15"
+      totalBets:
+        amount: "0"
+        denom: token
+      totalFees:
+        amount: "340000000"
+        denom: token
+      txCounter: "0"
+      txDataAll: ""
+    ```
+    4. Finally, prints out the `lottery` module balance and all the client balances to promt the balance & state changes
+    5. Script can be run many times to observe game status in a longer period.
+
+    **Note:** Although any number of clients can participate before the lottery session ends (when the block is mined), `txCounter` can never be observed above 9 because `lottery` object is reset after the winner is chosen.
+
+    ## Other Test Cases:
+    (Can be tested with Ignite CLI to see revert messages in Terminal)
+
+    1. Validator `lotteryvalidator` tries to participate in lottery:
+      **tx:** `lotterychaind tx lottery enter-lottery 5000000token 60000000token --from lotteryvalidator`
+      **result:** `raw_log: 'failed to execute message; message index: 0: proposer can''t participate!: unauthorized'`
+
+    2. Insufficient bet:
+      **tx:** `lotterychaind tx lottery enter-lottery 5000000token 200token --from client2 -y`
+      **result:** `raw_log: 'failed to execute message; message index: 0: bet is out of bounds: invalid request'`
+
+    3. Out of bounds bet:
+      **tx:** `lotterychaind tx lottery enter-lottery 50token 2000000token --from client2 -y`
+      **result:** `raw_log: 'failed to execute message; message index: 0: not enough fee!: insufficient fee'`
+    

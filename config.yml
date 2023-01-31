@@ -60,7 +60,7 @@ accounts:
 - name: client20
   coins:
   - 500000000token
-- name: alice
+- name: lotteryvalidator
   coins:
   - 2000000000token
   - 200000000stake
@@ -79,7 +79,7 @@ client:
   openapi:
     path: docs/static/openapi.yml
 validators:
-- name: alice
+- name: lotteryvalidator
   bonded: 100000000stake
   config:
     consensus:
