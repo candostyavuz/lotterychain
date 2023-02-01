@@ -1,5 +1,5 @@
-# lotterychain
-**lotterychain** is a blockchain built using Cosmos SDK (v0.46.7) and Tendermint and created with [Ignite CLI (v0.26.1)](https://ignite.com/cli).
+# Lotterychain
+**Lotterychain** is a blockchain built using Cosmos SDK (v0.46.7) and Tendermint and created with [Ignite CLI (v0.26.1)](https://ignite.com/cli).
 
 🥷🏻 [Can Dost Yavuz](https://www.linkedin.com/in/candosty/)
 ---
