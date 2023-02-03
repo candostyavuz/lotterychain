@@ -22,7 +22,7 @@ The blockchain (devnet) is configured with `config.yml`. Currently it has 20 cli
 
 **Cosmos SDK Modules**: The chain utilizes methods from the native Cosmos SDK modules, `x/bank` and `x/staking`, for asset transactions and validator set retrieval to prevent block proposers from participating in the lottery.
 
-## EnterLottery Transaction
+## Enter-Lottery Transaction
 
 **CLI Format:**
 `lotterychaind tx lottery enter-lottery [fee] [bet] [flags]`
@@ -33,7 +33,7 @@ The blockchain (devnet) is configured with `config.yml`. Currently it has 20 cli
 * `bet` must be between `1_000_000token` and `100_000_000token` (10^6 decimal fields included)
 * Each user can only participate once in the lottery session. 
 * **If multiple transactions are sent from the same address:**
-    - Only thelast transaction counts and last sent `bet` amount will be recorded in the `Participant` object.
+    - Only the last transaction counts and last sent `bet` amount will be recorded in the `Participant` object.
     - Previous `bet` that user paid will be refunded back to its wallet.
     - Any `fee` paid to contract is NOT refunded and stored in the lottery prize pool.
     - If previous `bet` of the user is max / min bet of the current lottery session, the new min/max bet is automatically adjusted based on the current bets in the pool and last bet amount in the participant transaction.
@@ -65,7 +65,7 @@ lotterychaind tx lottery enter-lottery 5000000token 9000000token --from client9 
 lotterychaind tx lottery enter-lottery 5000000token 10000000token --from client10 -y
 ```
 
-## EnterLottery Query Methods
+## Lottery Chain Query Methods
 
 1. `lotterychaind q lottery list-participant` 
 Queries the information of all participants of the current lottery session
